@@ -80,8 +80,8 @@ class RedisLogRecord(logging.LogRecord):
         self._raw.update(extra)
 
 class RedisLogger(logging.getLoggerClass()):
-    def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, *args, **extra):
-        record = RedisLogRecord(name, lvl, fn, lno, msg, args, exc_info, *args, **extra)
+    def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, *argss, **extra):
+        record = RedisLogRecord(name, lvl, fn, lno, msg, args, exc_info, *argss, **extra)
         return record
 
 
