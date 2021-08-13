@@ -51,8 +51,8 @@ def _getCallingContext():
 
 
 class RedisLogRecord(logging.LogRecord):
-    def __init__(self, name, lvl, fn, lno, msg, args, exc_info, *argss, **extra):
-        logging.LogRecord.__init__(self, name, lvl, fn, lno, msg, args, exc_info, func)
+    def __init__(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None, sinfo=None):
+        logging.LogRecord.__init__(self, name, level, fn, lno, msg, args, exc_info, func, extra, sinfo)
 
         # You can also access the following instance variables via the
         # formatter as
@@ -66,7 +66,7 @@ class RedisLogRecord(logging.LogRecord):
 
         self._raw = {
             'name': name,
-            'level': levelAsString(lvl),
+            'level': levelAsString(level),
             'filename': fn,
             'line_no': self.lineno,
             'msg': str(msg),
@@ -80,8 +80,8 @@ class RedisLogRecord(logging.LogRecord):
         self._raw.update(extra)
 
 class RedisLogger(logging.getLoggerClass()):
-    def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, *argss, **extra):
-        record = RedisLogRecord(name, lvl, fn, lno, msg, args, exc_info, *argss, **extra)
+    def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None, sinfo=None):
+        record = RedisLogRecord(name, level, fn, lno, msg, args, exc_info, func=None, extra=None, sinfo=None)
         return record
 
 
