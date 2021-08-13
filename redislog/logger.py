@@ -77,16 +77,11 @@ class RedisLogRecord(logging.LogRecord):
             'hostname': self.hostname,
             'traceback': exc_info
         }
+        self._raw.update(extra)
 
 class RedisLogger(logging.getLoggerClass()):
-    def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, func=None, extra=None):
-        record = RedisLogRecord(name, lvl, fn, lno, msg, args, exc_info, func=None)
-
-        if extra:
-            for key in extra:
-                if (key in ["message", "asctime"]) or (key in record.__dict__):
-                    raise KeyError("Attempt to overwrite %r in RedisLogRecord" % key)
-                record.__dict__[key] = extra[key]
+    def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, *args, **extra):
+        record = RedisLogRecord(name, lvl, fn, lno, msg, args, exc_info, *args, **extra)
         return record
 
 
