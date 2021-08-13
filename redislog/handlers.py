@@ -22,6 +22,25 @@ class RedisFormatter(logging.Formatter):
         return json.dumps(data)
 
 
+class RedisDictFormatter(logging.Formatter):
+    def format(self, record):
+        """
+        JSON-encode a record for serializing through redis.
+
+        Convert date to iso format, and stringify any exceptions.
+        """
+        data = record._raw.copy()
+
+        # serialize the datetime date as utc string
+        data['time'] = data['time'].isoformat()
+
+        # stringify exception data
+        if data.get('traceback'):
+            data['traceback'] = self.formatException(data['traceback'])
+
+        return data
+
+
 class RedisHandler(logging.Handler):
     """
     Publish messages to redis channel.
@@ -72,14 +91,14 @@ class RedisStreamHandler(logging.Handler):
         logging.Handler.__init__(self, level)
         self.channel = channel
         self.redis_client = redis_client
-        self.formatter = RedisFormatter()
+        self.formatter = RedisDictFormatter()
 
     def emit(self, record):
         """
         Publish record to redis logging channel
         """
 #         try:
-        self.redis_client.xadd(self.channel, '*', self.format(record))
+        self.redis_client.xadd(self.channel, self.format(record))
 #         except redis.RedisError:
 #             pass
 
