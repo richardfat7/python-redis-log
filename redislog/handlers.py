@@ -38,6 +38,9 @@ class RedisDictFormatter(logging.Formatter):
         if data.get('traceback'):
             data['traceback'] = self.formatException(data['traceback'])
 
+        for k, v in data.items():
+            data[k] = json.dumps(v)
+            
         return data
 
 
