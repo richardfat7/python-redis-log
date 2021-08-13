@@ -53,6 +53,37 @@ class RedisHandler(logging.Handler):
             pass
 
 
+class RedisStreamHandler(logging.Handler):
+    """
+    Publish messages to redis stream.
+
+    As a convenience, the classmethod to() can be used as a
+    constructor, just as in Andrei Savu's mongodb-log handler.
+    """
+
+    @classmethod
+    def to(cklass, channel, host='localhost', port=6379, password=None, level=logging.NOTSET):
+        return cklass(channel, redis.Redis(host=host, port=port, password=password), level=level)
+
+    def __init__(self, channel, redis_client, level=logging.NOTSET):
+        """
+        Create a new logger for the given stream and redis_client.
+        """
+        logging.Handler.__init__(self, level)
+        self.channel = channel
+        self.redis_client = redis_client
+        self.formatter = RedisFormatter()
+
+    def emit(self, record):
+        """
+        Publish record to redis logging channel
+        """
+        try:
+            self.redis_client.xadd(self.channel, '*', self.format(record))
+        except redis.RedisError:
+            pass
+
+
 class RedisListHandler(logging.Handler):
     """
     Publish messages to redis a redis list.
