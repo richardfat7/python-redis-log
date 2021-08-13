@@ -100,11 +100,10 @@ class RedisStreamHandler(logging.Handler):
         """
         Publish record to redis logging channel
         """
-        print(self.format(record))
-#         try:
-        self.redis_client.xadd(self.channel, self.format(record))
-#         except redis.RedisError:
-#             pass
+        try:
+            self.redis_client.xadd(self.channel, self.format(record))
+        except redis.RedisError:
+            pass
 
 
 class RedisListHandler(logging.Handler):
